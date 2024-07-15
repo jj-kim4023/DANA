@@ -37,7 +37,7 @@
 //                                            Authentication authentication) {
 //        CustomUserDetails customuserDetails = (CustomUserDetails) authentication.getPrincipal();
 //
-//        String username = customuserDetails.getUsername();
+//        String username = customuserDetails.getusername();
 //
 //        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 //        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();

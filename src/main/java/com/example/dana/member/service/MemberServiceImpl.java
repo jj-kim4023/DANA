@@ -1,52 +1,86 @@
 package com.example.dana.member.service;
 
-import com.example.dana.common.security.jwt.JwtProvider;
-import com.example.dana.member.dto.JoinRequest;
+import com.example.dana.common.exception.UserHandleException;
+import com.example.dana.common.security.jwt.component.TokenProvider;
+import com.example.dana.common.security.jwt.domain.entity.RefreshToken;
+import com.example.dana.common.security.jwt.controller.response.JwtTokenResponse;
+import com.example.dana.common.security.jwt.service.RefreshTokenService;
 import com.example.dana.member.domain.entity.Member;
-import com.example.dana.member.dto.MemberJoinResponse;
-import com.example.dana.member.dto.TokenInfo;
-import com.example.dana.member.exception.MemberDuplicateException;
 import com.example.dana.member.domain.repository.MemberRepository;
-import jakarta.transaction.Transactional;
+import com.example.dana.member.controller.request.LoginRequest;
+import com.example.dana.member.controller.request.LogoutRequest;
+import com.example.dana.member.controller.request.MemberSignUpRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import static com.example.dana.common.security.jwt.constants.JwtErrorMessage.INVALID_TOKEN_EXCEPTION;
+import static com.example.dana.member.constants.MemberErrorMessage.*;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(rollbackOn = Exception.class)
+@Transactional(readOnly = true)
 public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtProvider jwtProvider;
+    private final RefreshTokenService refreshTokenService;
+    private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
+    @Transactional
     @Override
-    public Member join(JoinRequest request) {
-        Boolean isExist = memberRepository.existsByEmail(request.getEmail());
-        if (isExist) {
-            throw new MemberDuplicateException();
+    public Member signUp(MemberSignUpRequest request) {
+        if (isExistsEmail(request.getEmail())) {
+            throw new UserHandleException(DUPLICATE_MEMBER_EXCEPTION);
         }
-        Member member = Member.generateNormalMember(request, passwordEncoder);
-        return memberRepository.save(member);
+        return memberRepository.save(Member.createUser(request, passwordEncoder));
     }
 
     @Transactional
-    public TokenInfo login(String memberId, String password) {
-        // 1. Login ID/PW 를 기반으로 Authentication 객체 생성
-        // 이때 authentication 는 인증 여부를 확인하는 authenticated 값이 false
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberId, password);
+    @Override
+    public JwtTokenResponse login(LoginRequest request) {
+        Member member = findByMemberEmail(request.getEmail());
+        validatePassword(request.getPassword(), member);
 
-        // 2. 실제 검증 (사용자 비밀번호 체크)이 이루어지는 부분
-        // authenticate 매서드가 실행될 때 CustomUserDetailsService 에서 만든 loadUserByUsername 메서드가 실행
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        Authentication authentication = authenticationManagerBuilder
+                .getObject()
+                .authenticate(request.toAuthentication());
+        JwtTokenResponse token = tokenProvider.createAccessAndRefreshTokens(authentication);
+        refreshTokenService.save(member, token.getRefreshToken());
 
-        // 3. 인증 정보를 기반으로 JWT 토큰 생성
-        // TokenInfo tokenInfo = jwtTokenProvider.generateToken(authentication);
-        // return tokenInfo;
-        return jwtProvider.generateToken(authentication);
+        return token;
+    }
+
+    @Transactional
+    @Override
+    public void logout(LogoutRequest request) {
+        if (!tokenProvider.validateToken(request.getAccessToken())) {
+            throw new UserHandleException(INVALID_TOKEN_EXCEPTION);
+        }
+        Authentication auth = tokenProvider.getAuthentication(request.getAccessToken());
+
+        Member member = findByMemberEmail(auth.getName());
+        RefreshToken refreshToken = refreshTokenService.findByMember(member);
+        refreshTokenService.delete(refreshToken);
+    }
+
+    @Override
+    public Member findByMemberEmail(String email) {
+
+        return memberRepository.findByEmail(email).orElseThrow(() -> new UserHandleException(NOT_FOUND_MEMBER_EXCEPTION));
+    }
+
+    private void validatePassword(String password, Member member) {
+        if (!passwordEncoder.matches(password, member.getPassword())) {
+            throw new UserHandleException(NOT_CORRECT_MEMBER_PASSWORD_EXCEPTION);
+        }
+    }
+
+    public boolean isExistsEmail(String email) {
+
+        return memberRepository.existsByEmail(email);
     }
 }

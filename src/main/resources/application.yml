@@ -1,0 +1,18 @@
+spring:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:~/test
+    username: sa
+    password: 12
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+
+  #secret_key
+jwt:
+  secret: agRot5OxbyIAgR9wjQr4Woh4WJr08Kq2995C7882483FF7C7C354249F6B6F7

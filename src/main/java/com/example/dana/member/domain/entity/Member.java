@@ -1,50 +1,69 @@
 package com.example.dana.member.domain.entity;
 
-import com.example.dana.member.constants.RoleType;
-import com.example.dana.member.dto.JoinRequest;
+import com.example.dana.member.constants.Role;
+import com.example.dana.member.controller.request.MemberSignUpRequest;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.Collections;
+
+import static com.example.dana.member.constants.Role.*;
 
 @Entity
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class Member {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Member implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
+
     private Long id;
 
-    @Column
+    @Column(nullable = false)
     private String email;
 
-    @Column
+    @Column(nullable = false)
     private String username;
 
-    @Column
+    @Column(nullable = false)
     private String password;
 
-    @Column
-    private RoleType role;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
-    public static Member generateNormalMember(JoinRequest request, PasswordEncoder passwordEncoder) {
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+
+        return Collections.singleton((GrantedAuthority) role);
+    }
+
+    private static Member createMember(MemberSignUpRequest request, PasswordEncoder passwordEncoder, Role role) {
         Member member = new Member();
         member.email = request.getEmail();
         member.username = request.getUsername();
         member.password = passwordEncoder.encode(request.getPassword());
-        member.role = RoleType.USER;
-        return member;
+        member.role = role;
 
+        return member;
+    }
+
+    public static Member createUser(MemberSignUpRequest request, PasswordEncoder passwordEncoder) {
+
+        return createMember(request, passwordEncoder, USER);
+    }
+
+    public static Member createSeller(MemberSignUpRequest request, PasswordEncoder passwordEncoder) {
+
+        return createMember(request, passwordEncoder, SELLER);
+    }
+
+    public static Member createAdmin(MemberSignUpRequest request, PasswordEncoder passwordEncoder) {
+
+        return createMember(request, passwordEncoder, ADMIN);
     }
 }

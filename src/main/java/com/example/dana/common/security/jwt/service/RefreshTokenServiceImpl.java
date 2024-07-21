@@ -15,6 +15,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 import static com.example.dana.common.security.jwt.constants.JwtErrorMessage.*;
 import static com.example.dana.common.security.jwt.domain.entity.RefreshToken.createRefreshToken;
 
@@ -29,6 +31,11 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Transactional
     @Override
     public void save(Member member, String token) {
+        Optional<RefreshToken> optionalRefreshToken = refreshTokenRepository.findByMember(member);
+        if (optionalRefreshToken.isPresent()) {
+            optionalRefreshToken.get().updateRefreshToken(token);
+            return;
+        }
         refreshTokenRepository.save(createRefreshToken(member, token));
     }
 

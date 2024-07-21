@@ -41,7 +41,6 @@ public class CategoryServiceImpl implements CategoryService {
                 .collect(Collectors.toList());
         parentCategory.addChildrenCategories(childCategories);
         Category savedCategory = categoryRepository.save(parentCategory);
-
         return CategoryResponse.fromEntity(savedCategory);
     }
 

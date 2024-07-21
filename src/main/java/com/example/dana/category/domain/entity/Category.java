@@ -38,7 +38,6 @@ public class Category extends BaseMetaDataEntity {
     }
 
     private static Category createCategory(String name) {
-
         return new Category(name);
     }
 
@@ -52,7 +51,6 @@ public class Category extends BaseMetaDataEntity {
     }
 
     public static Category fromRequest(CategoryRequest request) {
-
         return createCategory(request.getName());
     }
 

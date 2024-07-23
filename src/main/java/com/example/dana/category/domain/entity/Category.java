@@ -60,4 +60,8 @@ public class Category extends BaseMetaDataEntity {
             addChildCategory(child);
         }
     }
+
+    public void updateCategory(String name) {
+        this.name = name;
+    }
 }

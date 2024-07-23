@@ -44,32 +44,31 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryResponse.fromEntity(savedCategory);
     }
 
+    @Transactional
     @Override
     public CategoryResponse updateCategory(Long categoryId, CategoryRequest request) {
-        return null;
+        return CategoryResponse.fromEntity(categoryRepository.findById(categoryId).orElseThrow());
     }
 
     @Override
     public List<CategoryResponse> getAllCategories() {
-        return List.of();
-    }
-
-    @Override
-    public CategoryResponse getCategoriesByCategoryId(Long categoryId) {
         return null;
     }
 
     @Override
+    public CategoryResponse getCategoriesByCategoryId(Long categoryId) {
+        return CategoryResponse.fromEntity(categoryRepository.findById(categoryId).orElseThrow());    }
+
+    @Override
     public List<CategoryResponse> getChildrenCategoriesByParentId(Long parentId) {
-        return List.of();
+        return null;
     }
 
     private void validateActivation(Category parentCategory) {
     }
 
     private Category findByCategoryId(Long categoryId) {
-        Category category = categoryRepository.findById(categoryId)
+        return categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new UserHandleException(NOT_FOUND_CATEGORY_EXCEPTION));
-        return category;
     }
 }

@@ -11,4 +11,10 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     List<Category> findByParentIdAndActiveTrue(Long parentId);
 
     Category findByActiveTrueAndId(Long categoryId);
+
+    /*
+    List<Category> findByParentId(Long parentId);
+
+    Optional<Category> findByCode(String code);
+    */
 }

@@ -31,40 +31,62 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Transactional
     @Override
-    public CategoryResponse addChildrenCategories(Long parentId, List<CategoryRequest> requests) {
+    public List<CategoryResponse> addChildrenCategories(Long parentId, List<CategoryRequest> requests) {
         Category parentCategory = findByCategoryId(parentId);
 
-        validateActivation(parentCategory);
+        /** 직접적으로 활성화 상태를 검사*/
+        if (!parentCategory.isActive()) {
+            throw new UserHandleException("Parent category is not active");
+        }
 
         List<Category> childCategories = requests.stream()
                 .map(Category::fromRequest)
                 .collect(Collectors.toList());
         parentCategory.addChildrenCategories(childCategories);
-        Category savedCategory = categoryRepository.save(parentCategory);
-        return CategoryResponse.fromEntity(savedCategory);
+        Category savedParentCategory = categoryRepository.save(parentCategory);
+        return savedParentCategory.getChildrenCategories().stream()
+                .map(CategoryResponse::fromEntity)
+                .collect(Collectors.toList());
     }
 
     @Transactional
     @Override
     public CategoryResponse updateCategory(Long categoryId, CategoryRequest request) {
-        return CategoryResponse.fromEntity(categoryRepository.findById(categoryId).orElseThrow());
+        Category category = findByCategoryId(categoryId);
+        category.updateFromRequest(request);
+        Category savedCategory = categoryRepository.save(category);
+        return CategoryResponse.fromEntity(savedCategory);
+    }
+
+    @Transactional
+    @Override
+    public CategoryResponse deleteCategory(Long categoryId) {
+        Category category = findByCategoryId(categoryId);
+        categoryRepository.delete(category);
+        return CategoryResponse.fromEntity(category);
     }
 
     @Override
     public List<CategoryResponse> getAllCategories() {
-        return null;
+        List<Category> categories = categoryRepository.findAll();
+        return categories.stream()
+                .map(CategoryResponse::fromEntity)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public CategoryResponse getCategoriesByCategoryId(Long categoryId) {
-        return CategoryResponse.fromEntity(categoryRepository.findById(categoryId).orElseThrow());    }
+    public CategoryResponse getCategoryByCategoryId(Long categoryId) {
+        Category category = findByCategoryId(categoryId);
+        return CategoryResponse.fromEntity(category);
+    }
 
     @Override
     public List<CategoryResponse> getChildrenCategoriesByParentId(Long parentId) {
-        return null;
-    }
-
-    private void validateActivation(Category parentCategory) {
+        Category parentCategory = findByCategoryId(parentId);
+        List<Category> childrenCategories = parentCategory.getChildrenCategories();
+        return childrenCategories.stream()
+                .map(CategoryResponse::fromEntity)
+                .collect(Collectors.toList());
     }
 
     private Category findByCategoryId(Long categoryId) {

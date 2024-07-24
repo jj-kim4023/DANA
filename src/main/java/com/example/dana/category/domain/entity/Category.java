@@ -41,6 +41,10 @@ public class Category extends BaseMetaDataEntity {
         return new Category(name);
     }
 
+    public static Category fromRequest(CategoryRequest request) {
+        return createCategory(request.getName());
+    }
+
     public void addChildCategory(Category child) {
         child.setParent(this);
         this.children.add(child);
@@ -50,18 +54,21 @@ public class Category extends BaseMetaDataEntity {
         this.parent = parent;
     }
 
-    public static Category fromRequest(CategoryRequest request) {
-        return createCategory(request.getName());
-    }
-
-
     public void addChildrenCategories(List<Category> children) {
         for (Category child : children) {
             addChildCategory(child);
         }
     }
 
-    public void updateCategory(String name) {
+    public List<Category> getChildrenCategories() {
+        return this.children;
+    }
+
+    public void updateFromRequest(CategoryRequest request) {
+        this.setName(request.getName());
+    }
+
+    public void setName(String name) {
         this.name = name;
     }
 }

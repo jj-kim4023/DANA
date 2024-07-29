@@ -1,13 +1,7 @@
 package com.example.dana.seller.controller.response;
 
-import com.example.dana.category.controller.response.CategoryResponse;
-import com.example.dana.category.domain.entity.Category;
 import com.example.dana.seller.domain.entity.Item;
 import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @ToString
@@ -15,17 +9,22 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ItemResponse {
     private Long id; // 상품코드
-    private static String itemName; // 상품명
+    private String itemName; // 상품명
     private int price; // 가격
     private int stockNumber; // 재고
     private int count; // 판매 수량
-    private List<ItemResponse> items = new ArrayList<>();
-
+    private boolean active; // 활성 상태
     public static ItemResponse fromEntity(Item item) {
-        List<ItemResponse> itemResponse = null;
-        if (item != null) {
-            itemResponse = new ArrayList<>();
+        if (item == null) {
+            return null;
         }
-        return ItemResponse;
+        return new ItemResponse(
+                item.getId(),
+                item.getItemName(),
+                item.getPrice(),
+                item.getStockNumber(),
+                item.getCount(),
+                item.isActive()
+        );
     }
 }

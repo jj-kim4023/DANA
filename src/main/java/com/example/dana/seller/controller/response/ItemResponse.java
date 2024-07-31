@@ -3,6 +3,10 @@ package com.example.dana.seller.controller.response;
 import com.example.dana.seller.domain.entity.Item;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Getter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -14,6 +18,7 @@ public class ItemResponse {
     private int stockNumber; // 재고
     private int count; // 판매 수량
     private boolean active; // 활성 상태
+
     public static ItemResponse fromEntity(Item item) {
         if (item == null) {
             return null;

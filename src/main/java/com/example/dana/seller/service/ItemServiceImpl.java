@@ -1,56 +1,65 @@
 package com.example.dana.seller.service;
 
+import com.example.dana.common.exception.UserHandleException;
 import com.example.dana.seller.controller.request.ItemRequest;
 import com.example.dana.seller.controller.response.ItemResponse;
 import com.example.dana.seller.domain.entity.Item;
 import com.example.dana.seller.domain.repository.ItemRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static com.example.dana.category.constants.CategoryErrorMessage.NOT_FOUND_CATEGORY_EXCEPTION;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class ItemServiceImpl implements ItemService {
-    @Autowired
-    private ItemRepository itemRepository;
+    private final ItemRepository itemRepository;
 
+    @Transactional
     @Override
-    public Item createItem(Item item) {
-        return itemRepository.save(item);
+    public ItemResponse addItem(ItemRequest request) {
+        Item savedItem = itemRepository.save(Item.fromRequest(request));
+        return ItemResponse.fromEntity(savedItem);
+    }
+
+    @Transactional
+    @Override
+    public ItemResponse updateItem(Long itemId, ItemRequest request) {
+        Item item = findByItemId(itemId);
+        item.updateFromRequest(request);
+        Item savedItem = itemRepository.save(item);
+        return ItemResponse.fromEntity(savedItem);
+    }
+
+    @Transactional
+    @Override
+    public ItemResponse deleteItem(Long itemId) {
+        Item item = findByItemId(itemId);
+        itemRepository.delete(item);
+        return ItemResponse.fromEntity(item);
     }
 
     @Override
-    public Optional<Item> getItem(Long id) {
-        return itemRepository.findById(id);
+    public List<ItemResponse> getAllItems() {
+        List<Item> items = itemRepository.findAll();
+        return items.stream()
+                .map(ItemResponse::fromEntity)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Item> getAllItems() {
-        return itemRepository.findAll();
+    public ItemResponse getItemByItemId(Long itemId) {
+        Item item = findByItemId(itemId);
+        return ItemResponse.fromEntity(item);
     }
 
-    @Override
-    public Item updateItem(Long id, Item itemDetails) {
-        Optional<Item> existingItemOpt = itemRepository.findById(id);
-        if (existingItemOpt.isPresent()) {
-            Item existingItem = existingItemOpt.get();
-            existingItem.updateFrom(itemDetails); // 업데이트 메서드 호출
-            return itemRepository.save(existingItem);
-        }
-        return null;
-    }
-
-    @Override
-    public boolean deleteItem(Long id) {
-        if (itemRepository.existsById(id)) {
-            itemRepository.deleteById(id);
-            return true;
-        }
-        return false;
+    private Item findByItemId(Long itemId) {
+        return itemRepository.findById(itemId)
+                .orElseThrow(() -> new UserHandleException(NOT_FOUND_CATEGORY_EXCEPTION));
     }
 }

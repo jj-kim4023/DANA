@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ItemRequest {
     private String itemName;
-    private int price;
-    private int stockNumber;
-    private int count;
-    private boolean active;
+//    private int price;
+//    private int stockNumber;
+//    private int count;
+//    private boolean active;
 }

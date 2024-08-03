@@ -18,6 +18,9 @@ spring:
     init:
       mode: always
       data-locations: classpath:/sql/init.sql
+file:
+  upload-dir: "D:/userimg_img/"
+
 
   #secret_key
 jwt:

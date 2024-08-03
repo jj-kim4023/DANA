@@ -18,7 +18,7 @@ import static com.example.dana.seller.constants.ItemSuccessMessage.*;
 @Slf4j
 @RequestMapping("/api/items")
 public class ItemApiController {
-    private ItemService itemService;
+    private final ItemService itemService;
 
     @PostMapping
     public ResponseWrapper<ItemResponse> addItem(@RequestBody @Valid ItemRequest request) {

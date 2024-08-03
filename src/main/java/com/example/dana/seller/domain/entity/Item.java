@@ -32,8 +32,8 @@ public class Item extends BaseTimeEntity {
     private boolean active = true; // 활성 상태
 
     private String itemDescription; // 상품설명
-    private String imagename; // 상품 사진 파일이름
-    private String imageUrl; // 상품 사진 파일경로
+
+    private String imagePath; // 이미지 경로
 
     private Item(String itemName) {
         this.itemName = itemName;
@@ -44,7 +44,14 @@ public class Item extends BaseTimeEntity {
     }
 
     public static Item fromRequest(ItemRequest request) {
-        return createItem(request.getItemName());
+        Item item = new Item();
+        item.itemName = request.getItemName();
+//        item.price = request.getPrice();
+//        item.stockNumber = request.getStockNumber();
+//        item.count = request.getCount();
+//        item.active = request.isActive();
+//        item.itemDescription = request.getItemDescription();
+        return item;
     }
 
     public void updateFromRequest(ItemRequest request) {
@@ -52,6 +59,12 @@ public class Item extends BaseTimeEntity {
 //        this.price = request.getPrice();
 //        this.stockNumber = request.getStockNumber();
 //        this.count = request.getCount();
+//        this.active = request.isActive();
+//        this.itemDescription = request.getItemDescription();
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 
 //    public void updateFrom(Item itemDetails) {

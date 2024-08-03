@@ -32,4 +32,13 @@ public class ItemResponse {
                 item.isActive()
         );
     }
+
+    public static List<ItemResponse> fromEntities(List<Item> items) {
+        if (items == null) {
+            return List.of();
+        }
+        return items.stream()
+                .map(ItemResponse::fromEntity)
+                .collect(Collectors.toList());
+    }
 }

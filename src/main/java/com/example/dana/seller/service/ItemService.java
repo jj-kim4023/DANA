@@ -3,6 +3,7 @@ package com.example.dana.seller.service;
 import com.example.dana.seller.controller.request.ItemRequest;
 import com.example.dana.seller.controller.response.ItemResponse;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface ItemService {

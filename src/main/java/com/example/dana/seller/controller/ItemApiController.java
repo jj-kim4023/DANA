@@ -6,9 +6,11 @@ import com.example.dana.seller.controller.response.ItemResponse;
 import com.example.dana.seller.service.ItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 import static com.example.dana.seller.constants.ItemSuccessMessage.*;

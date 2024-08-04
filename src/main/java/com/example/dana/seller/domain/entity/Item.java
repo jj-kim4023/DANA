@@ -5,6 +5,11 @@ import com.example.dana.seller.controller.request.ItemRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+
 @Entity
 @Getter
 @ToString
@@ -33,7 +38,15 @@ public class Item extends BaseTimeEntity {
 
     private String itemDescription; // 상품설명
 
+    private LocalDateTime createdTime;
+    private LocalDateTime modifiedTime;
+
     private String imagePath; // 이미지 경로
+
+    private int fileAttached; // 파일 첨부
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<ItemImage> images;
 
     private Item(String itemName) {
         this.itemName = itemName;
@@ -48,9 +61,12 @@ public class Item extends BaseTimeEntity {
         item.itemName = request.getItemName();
 //        item.price = request.getPrice();
 //        item.stockNumber = request.getStockNumber();
-//        item.count = request.getCount();
-//        item.active = request.isActive();
+//        item.count = request.getCount(0);
+//        item.active = request.isActive(true);
 //        item.itemDescription = request.getItemDescription();
+//        item.createdTime = LocalDateTime.now();
+//        item.modifiedTime = LocalDateTime.now();
+//        item.fileAttached = request.getFileAttached();
         return item;
     }
 

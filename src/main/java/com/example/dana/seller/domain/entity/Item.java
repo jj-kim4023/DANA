@@ -38,16 +38,6 @@ public class Item extends BaseTimeEntity {
 
     private String itemDescription; // 상품설명
 
-    private LocalDateTime createdTime;
-    private LocalDateTime modifiedTime;
-
-    private String imagePath; // 이미지 경로
-
-    private int fileAttached; // 파일 첨부
-
-    @OneToMany(mappedBy = "item", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ItemImage> images;
-
     private Item(String itemName) {
         this.itemName = itemName;
     }
@@ -67,7 +57,7 @@ public class Item extends BaseTimeEntity {
 //        item.createdTime = LocalDateTime.now();
 //        item.modifiedTime = LocalDateTime.now();
 //        item.fileAttached = request.getFileAttached();
-        return item;
+        return createItem(request.getItemName());
     }
 
     public void updateFromRequest(ItemRequest request) {
@@ -78,24 +68,4 @@ public class Item extends BaseTimeEntity {
 //        this.active = request.isActive();
 //        this.itemDescription = request.getItemDescription();
     }
-
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
-    }
-
-//    public void updateFrom(Item itemDetails) {
-//        if (itemDetails.getItemName() != null) {
-//            this.itemName = itemDetails.getItemName();
-//        }
-//        if (itemDetails.getPrice() >= 0) {
-//            this.price = itemDetails.getPrice();
-//        }
-//        if (itemDetails.getStockNumber() >= 0) {
-//            this.stockNumber = itemDetails.getStockNumber();
-//        }
-//        if (itemDetails.getCount() >= 0) {
-//            this.count = itemDetails.getCount();
-//        }
-//        this.active = itemDetails.isActive();
-//    }
 }

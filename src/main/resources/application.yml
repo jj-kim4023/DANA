@@ -18,9 +18,14 @@ spring:
     init:
       mode: always
       data-locations: classpath:/sql/init.sql
-image:
-  upload:
-    dir: D:/userimg_img/
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+#image:
+#  upload:
+#    dir: D:/userimg_img/
 
 
   #secret_key

@@ -10,10 +10,5 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor
 public class ImageRequest {
-    private Long id;
-    private String imagePath; // 이미지 경로
-    private List<MultipartFile> image;
-    private List<String> oriImageName;
-    private List<String> stoImageName;
-    private int fileAttached; // 파일첨부여부 (첨부1, 미첨부0)
+    private List<MultipartFile> images; // 이미지 파일들
 }

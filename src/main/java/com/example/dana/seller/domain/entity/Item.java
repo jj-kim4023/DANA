@@ -38,34 +38,37 @@ public class Item extends BaseTimeEntity {
 
     private String itemDescription; // 상품설명
 
-    private Item(String itemName) {
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ItemImage> itemImages; // 연관된 이미지들
+
+    // 필요한 경우 추가 생성자 정의
+    public Item(String itemName, int price, int stockNumber, int count, boolean active, String itemDescription) {
         this.itemName = itemName;
+        this.price = price;
+        this.stockNumber = stockNumber;
+        this.count = count;
+        this.active = active;
+        this.itemDescription = itemDescription;
     }
 
-    public static Item createItem(String itemName) {
-        return new Item(itemName);
-    }
-
+    // DTO에서 엔티티 생성
     public static Item fromRequest(ItemRequest request) {
-        Item item = new Item();
-        item.itemName = request.getItemName();
-//        item.price = request.getPrice();
-//        item.stockNumber = request.getStockNumber();
-//        item.count = request.getCount(0);
-//        item.active = request.isActive(true);
-//        item.itemDescription = request.getItemDescription();
-//        item.createdTime = LocalDateTime.now();
-//        item.modifiedTime = LocalDateTime.now();
-//        item.fileAttached = request.getFileAttached();
-        return createItem(request.getItemName());
+        return new Item(
+                request.getItemName(),
+                request.getPrice(),
+                request.getStockNumber(),
+                request.getCount(),
+                request.isActive(),
+                request.getItemDescription()
+        );
     }
 
     public void updateFromRequest(ItemRequest request) {
         this.itemName = request.getItemName();
-//        this.price = request.getPrice();
-//        this.stockNumber = request.getStockNumber();
-//        this.count = request.getCount();
-//        this.active = request.isActive();
-//        this.itemDescription = request.getItemDescription();
+        this.price = request.getPrice();
+        this.stockNumber = request.getStockNumber();
+        this.count = request.getCount();
+        this.active = request.isActive();
+        this.itemDescription = request.getItemDescription();
     }
 }
